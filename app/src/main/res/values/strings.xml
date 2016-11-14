@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">CriminalIntent</string>
-    <string name="fragment_crime_title_hint">Enter a title for the crime</string>
+    <string name="crime_title_hint">Enter a title for the crime</string>
+    <string name="crime_title_text_view">Title</string>
+    <string name="crime_details_text_view">Details</string>
+    <string name="crime_solved_check_box">Solved</string>
 </resources>

@@ -27,19 +27,30 @@
         android:layout_height="wrap_content"
         android:text="@string/crime_details_text_view"/>
 
-    <Button
-        android:id="@+id/dateButton"
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        tools:text="Date Button"/>
+        android:layout_marginRight="16dp">
 
-    <CheckBox
-        android:id="@+id/solvedCheckBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:text="@string/crime_solved_check_box"/>
+        <Button
+            android:id="@+id/dateButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            tools:text="2016-11-14 10:22:00 PM"
+            android:layout_weight="2"/>
+
+        <CheckBox
+            android:id="@+id/solvedCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:text="@string/crime_solved_check_box"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
 </LinearLayout>
