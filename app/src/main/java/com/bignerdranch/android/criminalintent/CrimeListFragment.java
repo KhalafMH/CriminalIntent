@@ -1,5 +1,6 @@
 package com.bignerdranch.android.criminalintent;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +27,13 @@ public class CrimeListFragment extends Fragment {
         mCrimeList = CrimeLab.getInstance(getContext()).getCrimes();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        mRecyclerView.getAdapter().notifyDataSetChanged();
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -36,7 +45,7 @@ public class CrimeListFragment extends Fragment {
         return v;
     }
 
-    private static class CrimeHolder extends RecyclerView.ViewHolder
+    private class CrimeHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
 
         private Crime mCrime;
@@ -53,12 +62,19 @@ public class CrimeListFragment extends Fragment {
             mTitleTextView = (TextView) view.findViewById(R.id.titleTextView);
             mDateTextView = (TextView) view.findViewById(R.id.dateTextView);
             mSolvedCheckBox = (CheckBox) view.findViewById(R.id.solvedCheckBox);
+
+            mSolvedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                    mCrime.setSolved(b);
+                }
+            });
         }
 
         @Override
         public void onClick(View view) {
-            Toast.makeText(view.getContext(), mCrime.getTitle() + " was clicked!",
-                    Toast.LENGTH_SHORT).show();
+            Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getId());
+            getActivity().startActivity(intent);
         }
 
         public void bindCrime(Crime crime) {

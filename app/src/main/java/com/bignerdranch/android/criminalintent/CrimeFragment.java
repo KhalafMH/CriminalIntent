@@ -13,8 +13,12 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
+import java.util.UUID;
+
 
 public class CrimeFragment extends Fragment {
+
+    private static final String ARG_CRIME_ID = "crime_id";
 
     // model
     Crime mCrime;
@@ -28,7 +32,13 @@ public class CrimeFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mCrime = new Crime("");
+        Bundle args = getArguments();
+        UUID crimeId = (UUID) args.getSerializable(ARG_CRIME_ID);
+        if (crimeId != null) {
+            mCrime = CrimeLab.getInstance(getContext()).getCrime(crimeId);
+        } else {
+            mCrime = new Crime("");
+        }
     }
 
     @Nullable
@@ -37,6 +47,7 @@ public class CrimeFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_crime, container, false);
 
         mTitleEditText = (EditText) v.findViewById(R.id.crimeTitleEditText);
+        mTitleEditText.setText(mCrime.getTitle());
         mTitleEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -69,5 +80,15 @@ public class CrimeFragment extends Fragment {
 
 
         return v;
+    }
+
+    public static CrimeFragment newInstance(UUID crimeId) {
+        CrimeFragment crimeFragment = new CrimeFragment();
+
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_CRIME_ID, crimeId);
+        crimeFragment.setArguments(args);
+
+        return crimeFragment;
     }
 }
