@@ -28,6 +28,16 @@ public class CrimeFragment extends Fragment {
     Button mDateButton;
     CheckBox mSolvedCheckBox;
 
+    public static CrimeFragment newInstance(UUID crimeId) {
+        CrimeFragment crimeFragment = new CrimeFragment();
+
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_CRIME_ID, crimeId);
+        crimeFragment.setArguments(args);
+
+        return crimeFragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,17 +88,6 @@ public class CrimeFragment extends Fragment {
         });
 
 
-
         return v;
-    }
-
-    public static CrimeFragment newInstance(UUID crimeId) {
-        CrimeFragment crimeFragment = new CrimeFragment();
-
-        Bundle args = new Bundle();
-        args.putSerializable(ARG_CRIME_ID, crimeId);
-        crimeFragment.setArguments(args);
-
-        return crimeFragment;
     }
 }

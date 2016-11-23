@@ -15,11 +15,11 @@ public abstract class SingleFragmentActivity extends FragmentActivity {
         setContentView(R.layout.activity_fragment);
 
         FragmentManager fm = getSupportFragmentManager();
-        mFragment = fm.findFragmentById(R.id.fragment_container);
+        mFragment = fm.findFragmentById(R.id.fragmentContainer);
         if (mFragment == null) {
             mFragment = createFragment();
             fm.beginTransaction()
-                    .add(R.id.fragment_container, mFragment)
+                    .add(R.id.fragmentContainer, mFragment)
                     .commit();
         }
     }
