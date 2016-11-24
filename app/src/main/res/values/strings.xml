@@ -4,4 +4,5 @@
     <string name="crime_title_text_view">Title</string>
     <string name="crime_details_text_view">Details</string>
     <string name="crime_solved_check_box">Solved</string>
+    <string name="date_picker_title">Pick date of crime</string>
 </resources>
