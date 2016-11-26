@@ -6,4 +6,7 @@
     <string name="crime_solved_check_box">Solved</string>
     <string name="date_picker_title">Pick date of crime</string>
     <string name="menu_add_crime">Add Crime</string>
+    <string name="menu_show_subtitle">Show Subtitle</string>
+    <string name="subtitle_format">%1$d crimes</string>
+    <string name="menu_hide_subtitle">Hide Subtitle</string>
 </resources>
