@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -27,7 +26,10 @@ public class CrimeListFragment extends Fragment {
 
     private List<Crime> mCrimeList;
     private RecyclerView mRecyclerView;
+    private CrimeListAdapter mAdapter;
     private RelativeLayout mAddCrimePlaceholderLayout;
+
+    // state variables
     private boolean mSubtitleVisible;
 
     @Override
@@ -85,9 +87,10 @@ public class CrimeListFragment extends Fragment {
         }
         View v = inflater.inflate(R.layout.fragment_crime_list, container, false);
 
+        mAdapter = new CrimeListAdapter(mCrimeList);
         mRecyclerView = (RecyclerView) v.findViewById(R.id.recyclerView);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mRecyclerView.setAdapter(new CrimeListAdapter(mCrimeList));
+        mRecyclerView.setAdapter(mAdapter);
 
         mAddCrimePlaceholderLayout = (RelativeLayout) v.findViewById(R.id.addCrimeLayout);
         Button addCrimeButton = (Button) v.findViewById(R.id.addCrimeButton);
@@ -110,7 +113,10 @@ public class CrimeListFragment extends Fragment {
     }
 
     private void updateUi() {
-        mRecyclerView.getAdapter().notifyDataSetChanged();
+        mCrimeList = CrimeLab.getInstance(getContext()).getCrimes();
+
+        mAdapter.setCrimes(mCrimeList);
+        mAdapter.notifyDataSetChanged();
         updateSubtitle();
         if (mCrimeList.size() != 0) {
             mAddCrimePlaceholderLayout.setVisibility(View.GONE);
@@ -130,7 +136,8 @@ public class CrimeListFragment extends Fragment {
     }
 
     private void createNewCrime() {
-        Crime crime = new Crime("Crime #" + mCrimeList.size());
+        Crime crime = new Crime();
+        crime.setTitle("Crime #" + mCrimeList.size());
         CrimeLab.getInstance(getContext()).addCrime(crime);
 
         Intent intent = CrimePagerActivity.newIntent(getContext(), crime.getId());
@@ -159,6 +166,7 @@ public class CrimeListFragment extends Fragment {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     mCrime.setSolved(b);
+                    CrimeLab.getInstance(getContext()).updateCrime(mCrime);
                 }
             });
         }
@@ -180,8 +188,12 @@ public class CrimeListFragment extends Fragment {
     private class CrimeListAdapter extends RecyclerView.Adapter<CrimeHolder> {
         private List<Crime> mCrimes;
 
-        public CrimeListAdapter(List<Crime> crimeList) {
-            mCrimes = crimeList;
+        public CrimeListAdapter(List<Crime> crimes) {
+            mCrimes = crimes;
+        }
+
+        public void setCrimes(List<Crime> crimes) {
+            mCrimes = crimes;
         }
 
         @Override

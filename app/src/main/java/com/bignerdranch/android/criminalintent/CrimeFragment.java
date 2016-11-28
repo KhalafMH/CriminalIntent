@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,7 +24,7 @@ import java.util.UUID;
 
 
 public class CrimeFragment extends Fragment {
-
+    private static final String TAG = CrimeFragment.class.getSimpleName();
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
     private static final int REQUEST_DATE = 0;
@@ -44,6 +45,13 @@ public class CrimeFragment extends Fragment {
         crimeFragment.setArguments(args);
 
         return crimeFragment;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        CrimeLab.getInstance(getContext()).updateCrime(mCrime);
     }
 
     @Override
@@ -68,7 +76,7 @@ public class CrimeFragment extends Fragment {
         if (crimeId != null) {
             mCrime = CrimeLab.getInstance(getContext()).getCrime(crimeId);
         } else {
-            mCrime = new Crime("");
+            mCrime = new Crime();
         }
     }
 
@@ -112,6 +120,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 mCrime.setSolved(b);
+                CrimeLab.getInstance(getContext()).updateCrime(mCrime);
             }
         });
 
@@ -136,6 +145,12 @@ public class CrimeFragment extends Fragment {
         if (requestCode == REQUEST_DATE) {
             Date date = DatePickerFragment.getResult(data);
             mCrime.setDate(date);
+            CrimeLab.getInstance(getContext()).updateCrime(mCrime);
+            if (BuildConfig.DEBUG) {
+                if (mCrime.equals(CrimeLab.getInstance(getContext()).getCrime(mCrime.getId()))) {
+                    Log.e(TAG, "data update failed");
+                }
+            }
             updateDateButton();
         }
     }

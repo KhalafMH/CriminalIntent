@@ -14,11 +14,27 @@ public class Crime {
     private Date mDate;
     private boolean mSolved;
 
-    public Crime(String title) {
-        mId = UUID.randomUUID();
-        mTitle = title;
+    public Crime() {
+        this(UUID.randomUUID());
+    }
+
+    public Crime(UUID id) {
+        mId = id;
+        mTitle = "";
         mDate = new Date();
         mSolved = false;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Crime)) {
+            return false;
+        }
+        Crime that = (Crime) obj;
+        return mId.equals(that.mId)
+                && mTitle.equals(that.mTitle)
+                && mDate.equals(that.mDate)
+                && mSolved == that.mSolved;
     }
 
     public Date getDate() {

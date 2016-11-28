@@ -1,9 +1,16 @@
 package com.bignerdranch.android.criminalintent;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
+
+import com.bignerdranch.android.criminalintent.database.CrimeCursorWrapper;
+import com.bignerdranch.android.criminalintent.database.CrimeDatabaseHelper;
+import com.bignerdranch.android.criminalintent.database.CrimeDbSchema.CrimeTable;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,10 +20,13 @@ import java.util.UUID;
 public class CrimeLab {
     private static CrimeLab sCrimeLab;
 
-    private List<Crime> mCrimes;
+    //    private List<Crime> mCrimes;
+    private SQLiteDatabase mDatabase;
+    private Context mContext;
 
     private CrimeLab(Context context) {
-        mCrimes = new ArrayList<>();
+        mContext = context.getApplicationContext();
+        mDatabase = new CrimeDatabaseHelper(mContext).getWritableDatabase();
     }
 
     public static CrimeLab getInstance(Context context) {
@@ -27,30 +37,80 @@ public class CrimeLab {
     }
 
     public void addCrime(Crime crime) {
-        mCrimes.add(crime);
+        ContentValues values = getCrimeContentValues(crime);
+
+        mDatabase.insert(CrimeTable.NAME, null, values);
+    }
+
+    @NonNull
+    private ContentValues getCrimeContentValues(Crime crime) {
+        ContentValues values = new ContentValues();
+        values.put(CrimeTable.Cols.UUID, crime.getId().toString());
+        values.put(CrimeTable.Cols.TITLE, crime.getTitle());
+        values.put(CrimeTable.Cols.DATE, crime.getDate().getTime());
+        values.put(CrimeTable.Cols.SOLVED, crime.isSolved());
+        return values;
+    }
+
+    public void updateCrime(Crime crime) {
+        mDatabase.update(
+                CrimeTable.NAME,
+                getCrimeContentValues(crime),
+                CrimeTable.Cols.UUID + " = ?",
+                new String[]{crime.getId().toString()}
+        );
     }
 
     public List<Crime> getCrimes() {
-        return Collections.unmodifiableList(mCrimes);
+        CrimeCursorWrapper crimeCursor = queryCrimes(null, null);
+
+        ArrayList<Crime> crimesList = new ArrayList<>(crimeCursor.getCount());
+        try {
+            crimeCursor.moveToFirst();
+            while (!crimeCursor.isAfterLast()) {
+                crimesList.add(crimeCursor.getCrime());
+                crimeCursor.moveToNext();
+            }
+            return crimesList;
+        } finally {
+            crimeCursor.close();
+        }
     }
 
     public Crime getCrime(UUID crimeId) {
-        for (Crime crime : mCrimes) {
-            if (crime.getId().equals(crimeId)) {
-                return crime;
+        CrimeCursorWrapper crimeCursor = queryCrimes(
+                CrimeTable.Cols.UUID + " = ?",
+                new String[]{crimeId.toString()}
+        );
+        try {
+            if (crimeCursor.getCount() == 0) {
+                return null;
             }
+            crimeCursor.moveToFirst();
+            return crimeCursor.getCrime();
+        } finally {
+            crimeCursor.close();
         }
-        return null;
     }
 
     public void deleteCrime(UUID id) {
-        for (int i = 0; i < mCrimes.size(); ++i) {
-            if (mCrimes.get(i).getId().equals(id)) {
-                mCrimes.remove(i);
-                return;
-            }
-        }
+        mDatabase.delete(
+                CrimeTable.NAME,
+                CrimeTable.Cols.UUID + " = ?",
+                new String[]{id.toString()}
+        );
+    }
 
-        throw new IllegalArgumentException("There is no crime with the specified ID");
+    private CrimeCursorWrapper queryCrimes(String selection, String[] selectionArgs) {
+        Cursor cursor = mDatabase.query(
+                CrimeTable.NAME,
+                null,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+        );
+        return new CrimeCursorWrapper(cursor);
     }
 }
