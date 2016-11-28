@@ -10,4 +10,6 @@
     <string name="subtitle_format">%1$d crimes</string>
     <string name="menu_hide_subtitle">Hide Subtitle</string>
     <string name="menu_delete_crime">Delete Crime</string>
+    <string name="crime_list_no_crimes_text_view">There are no crimes currently</string>
+    <string name="crime_list_add_crime_button">Add Crime</string>
 </resources>
