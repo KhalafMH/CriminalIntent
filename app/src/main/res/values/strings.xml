@@ -9,4 +9,5 @@
     <string name="menu_show_subtitle">Show Subtitle</string>
     <string name="subtitle_format">%1$d crimes</string>
     <string name="menu_hide_subtitle">Hide Subtitle</string>
+    <string name="menu_delete_crime">Delete Crime</string>
 </resources>
