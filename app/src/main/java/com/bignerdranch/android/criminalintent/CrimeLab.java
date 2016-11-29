@@ -42,16 +42,6 @@ public class CrimeLab {
         mDatabase.insert(CrimeTable.NAME, null, values);
     }
 
-    @NonNull
-    private ContentValues getCrimeContentValues(Crime crime) {
-        ContentValues values = new ContentValues();
-        values.put(CrimeTable.Cols.UUID, crime.getId().toString());
-        values.put(CrimeTable.Cols.TITLE, crime.getTitle());
-        values.put(CrimeTable.Cols.DATE, crime.getDate().getTime());
-        values.put(CrimeTable.Cols.SOLVED, crime.isSolved());
-        return values;
-    }
-
     public void updateCrime(Crime crime) {
         mDatabase.update(
                 CrimeTable.NAME,
@@ -99,6 +89,17 @@ public class CrimeLab {
                 CrimeTable.Cols.UUID + " = ?",
                 new String[]{id.toString()}
         );
+    }
+
+    @NonNull
+    private ContentValues getCrimeContentValues(Crime crime) {
+        ContentValues values = new ContentValues();
+        values.put(CrimeTable.Cols.UUID, crime.getId().toString());
+        values.put(CrimeTable.Cols.TITLE, crime.getTitle());
+        values.put(CrimeTable.Cols.DATE, crime.getDate().getTime());
+        values.put(CrimeTable.Cols.SOLVED, crime.isSolved());
+        values.put(CrimeTable.Cols.SUSPECT, crime.getSuspect());
+        return values;
     }
 
     private CrimeCursorWrapper queryCrimes(String selection, String[] selectionArgs) {

@@ -12,4 +12,15 @@
     <string name="menu_delete_crime">Delete Crime</string>
     <string name="crime_list_no_crimes_text_view">There are no crimes currently</string>
     <string name="crime_list_add_crime_button">Add Crime</string>
+    <string name="crime_choose_suspect_button">Choose Suspect</string>
+    <string name="crime_send_report_button">Send Report</string>
+    <string name="crime_report">%1$s!
+        The crime was discovered on %2$s. %3$s, and %4$s.
+    </string>
+    <string name="crime_report_solved">The crime is solved</string>
+    <string name="crime_report_unsolved">The crime is not yet solved</string>
+    <string name="crime_report_suspect">the suspect is %s</string>
+    <string name="crime_report_no_suspect">there is no suspect</string>
+    <string name="crime_report_subject">CriminalIntent Crime Report</string>
+    <string name="send_report">Send crime report via</string>
 </resources>

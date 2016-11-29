@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.bignerdranch.android.criminalintent.database.CrimeDbSchema.CrimeTable;
+
 public class CrimeDatabaseHelper extends SQLiteOpenHelper {
     private static final int VERSION = 1;
     private static final String NAME = "CrimeDatabase.db";
@@ -15,13 +17,14 @@ public class CrimeDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL("create table "
-                + CrimeDbSchema.CrimeTable.NAME
+                + CrimeTable.NAME
                 + " ("
                 + "id primary key" + ", "
-                + CrimeDbSchema.CrimeTable.Cols.UUID + " text unique" + ", "
-                + CrimeDbSchema.CrimeTable.Cols.TITLE + " text" + ", "
-                + CrimeDbSchema.CrimeTable.Cols.DATE + " date" + ", "
-                + CrimeDbSchema.CrimeTable.Cols.SOLVED + " int"
+                + CrimeTable.Cols.UUID + " text unique" + ", "
+                + CrimeTable.Cols.TITLE + " text" + ", "
+                + CrimeTable.Cols.DATE + " date" + ", "
+                + CrimeTable.Cols.SOLVED + " int" + ", "
+                + CrimeTable.Cols.SUSPECT + " text"
                 + ");"
         );
     }
