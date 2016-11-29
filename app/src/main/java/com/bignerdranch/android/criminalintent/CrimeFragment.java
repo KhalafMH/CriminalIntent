@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ShareCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
@@ -165,12 +166,12 @@ public class CrimeFragment extends Fragment {
                         suspectString
                 );
 
-                Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.putExtra(Intent.EXTRA_TEXT, report);
-                intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject));
-                intent.setType("text/plain");
-                intent = Intent.createChooser(intent, getString(R.string.send_report));
-                startActivity(intent);
+                ShareCompat.IntentBuilder.from(getActivity())
+                        .setSubject(getString(R.string.crime_report_subject))
+                        .setText(report)
+                        .setType("text/plain")
+                        .setChooserTitle(R.string.send_report)
+                        .startChooser();
             }
         });
 
