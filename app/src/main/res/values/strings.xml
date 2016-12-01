@@ -23,4 +23,6 @@
     <string name="crime_report_no_suspect">there is no suspect</string>
     <string name="crime_report_subject">CriminalIntent Crime Report</string>
     <string name="send_report">Send crime report via</string>
+    <string name="crime_photo_view_content_description">crime photo view</string>
+    <string name="crime_camera_button_content_description">camera button</string>
 </resources>

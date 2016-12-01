@@ -5,8 +5,11 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ShareCompat;
@@ -24,7 +27,10 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 
+import java.io.File;
 import java.util.Date;
 import java.util.UUID;
 
@@ -35,6 +41,7 @@ public class CrimeFragment extends Fragment {
     private static final String DIALOG_DATE = "DialogDate";
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_SUSPECT = 1;
+    private static final int REQUEST_CAMERA = 2;
     private final CrimeLab mCrimeLab = CrimeLab.getInstance(getContext());
 
     // model
@@ -42,6 +49,8 @@ public class CrimeFragment extends Fragment {
 
     // reference fields
     private EditText mTitleEditText;
+    private ImageView mPhotoImageView;
+    private ImageButton mCameraButton;
     private Button mDateButton;
     private CheckBox mSolvedCheckBox;
     private Button mSuspectButton;
@@ -175,6 +184,28 @@ public class CrimeFragment extends Fragment {
             }
         });
 
+        // setup the photo ImageView
+        mPhotoImageView = (ImageView) v.findViewById(R.id.photoImageView);
+        updatePhotoImageView();
+
+        // setup the camera button
+        mCameraButton = (ImageButton) v.findViewById(R.id.cameraImageButton);
+        final Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        final File photoFile = mCrimeLab.getPhotoFile(mCrime);
+        boolean canTakePhoto = photoFile != null
+                && cameraIntent.resolveActivity(packageManager) != null;
+        mCameraButton.setEnabled(canTakePhoto);
+        if (canTakePhoto) {
+            final Uri uri = Uri.fromFile(photoFile);
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+        }
+        mCameraButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivityForResult(cameraIntent, REQUEST_CAMERA);
+            }
+        });
+
         return v;
     }
 
@@ -220,6 +251,20 @@ public class CrimeFragment extends Fragment {
             } finally {
                 cursor.close();
             }
+        }
+
+        if (requestCode == REQUEST_CAMERA) {
+            updatePhotoImageView();
+        }
+    }
+
+    private void updatePhotoImageView() {
+        final File photoFile = mCrimeLab.getPhotoFile(mCrime);
+        if (photoFile == null || !photoFile.exists()) {
+            mPhotoImageView.setImageDrawable(null);
+        } else {
+            Bitmap photoBitmap = PictureUtils.getScaledBitmap(photoFile.getPath(), getActivity());
+            mPhotoImageView.setImageBitmap(photoBitmap);
         }
     }
 
