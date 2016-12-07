@@ -1,6 +1,6 @@
 package com.bignerdranch.android.criminalintent;
 
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -23,6 +23,8 @@ import java.util.List;
 
 public class CrimeListFragment extends Fragment {
     private static final String SAVED_SUBTITLE_VISIBLE = "subtitle_visible";
+
+    private Callbacks mCallbacks;
 
     private List<Crime> mCrimeList;
     private RecyclerView mRecyclerView;
@@ -112,7 +114,19 @@ public class CrimeListFragment extends Fragment {
         outState.putBoolean(SAVED_SUBTITLE_VISIBLE, mSubtitleVisible);
     }
 
-    private void updateUi() {
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = null;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallbacks = (Callbacks) context;
+    }
+
+    public void updateUi() {
         mCrimeList = CrimeLab.getInstance(getContext()).getCrimes();
 
         mAdapter.setCrimes(mCrimeList);
@@ -140,8 +154,11 @@ public class CrimeListFragment extends Fragment {
         crime.setTitle("Crime #" + mCrimeList.size());
         CrimeLab.getInstance(getContext()).addCrime(crime);
 
-        Intent intent = CrimePagerActivity.newIntent(getContext(), crime.getId());
-        startActivity(intent);
+        mCallbacks.onCrimeSelected(crime);
+    }
+
+    public interface Callbacks {
+        void onCrimeSelected(Crime crime);
     }
 
     private class CrimeHolder extends RecyclerView.ViewHolder
@@ -173,8 +190,7 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View view) {
-            Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId());
-            startActivity(intent);
+            mCallbacks.onCrimeSelected(mCrime);
         }
 
         public void bindCrime(Crime crime) {

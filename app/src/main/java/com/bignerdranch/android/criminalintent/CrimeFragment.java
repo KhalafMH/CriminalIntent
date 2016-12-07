@@ -2,6 +2,7 @@ package com.bignerdranch.android.criminalintent;
 
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -43,10 +44,8 @@ public class CrimeFragment extends Fragment {
     private static final int REQUEST_SUSPECT = 1;
     private static final int REQUEST_CAMERA = 2;
     private final CrimeLab mCrimeLab = CrimeLab.getInstance(getContext());
-
     // model
     private Crime mCrime;
-
     // reference fields
     private EditText mTitleEditText;
     private ImageView mPhotoImageView;
@@ -55,6 +54,7 @@ public class CrimeFragment extends Fragment {
     private CheckBox mSolvedCheckBox;
     private Button mSuspectButton;
     private Button mSendReportButton;
+    private Callbacks mCallbacks;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         CrimeFragment crimeFragment = new CrimeFragment();
@@ -67,18 +67,22 @@ public class CrimeFragment extends Fragment {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = null;
+    }
 
-        CrimeLab.getInstance(getContext()).updateCrime(mCrime);
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallbacks = (Callbacks) context;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.deleteCrimeMenuItem:
-                mCrimeLab.deleteCrime(mCrime.getId());
-                getActivity().finish();
+                mCallbacks.onCrimeDeleted(mCrime);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -95,7 +99,7 @@ public class CrimeFragment extends Fragment {
         if (crimeId != null) {
             mCrime = mCrimeLab.getCrime(crimeId);
         } else {
-            mCrime = new Crime();
+            throw new IllegalArgumentException("No crime passed as argument");
         }
     }
 
@@ -115,6 +119,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 mCrime.setTitle(charSequence.toString().trim());
+                mCallbacks.onCrimeUpdated(mCrime);
             }
 
             @Override
@@ -139,6 +144,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 mCrime.setSolved(b);
+                mCallbacks.onCrimeUpdated(mCrime);
             }
         });
 
@@ -226,6 +232,7 @@ public class CrimeFragment extends Fragment {
         if (requestCode == REQUEST_DATE) {
             Date date = DatePickerFragment.getResult(data);
             mCrime.setDate(date);
+            mCallbacks.onCrimeUpdated(mCrime);
             if (BuildConfig.DEBUG) {
                 if (mCrime.equals(mCrimeLab.getCrime(mCrime.getId()))) {
                     Log.e(TAG, "data update failed");
@@ -247,6 +254,7 @@ public class CrimeFragment extends Fragment {
                 }
                 cursor.moveToFirst();
                 mCrime.setSuspect(cursor.getString(0));
+                mCallbacks.onCrimeUpdated(mCrime);
                 updateSuspectButton();
             } finally {
                 cursor.close();
@@ -276,5 +284,11 @@ public class CrimeFragment extends Fragment {
         if (!mCrime.getSuspect().equals("")) {
             mSuspectButton.setText(mCrime.getSuspect());
         }
+    }
+
+    public interface Callbacks {
+        void onCrimeUpdated(Crime crime);
+
+        void onCrimeDeleted(Crime crime);
     }
 }
